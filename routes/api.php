@@ -14,3 +14,10 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/','PostController@index');
+
+Route::apiResource('/products','ProductController');
+
+Route::group(['prefix'=>'products'],function(){
+    Route::apiResource('/{product}/reviews','ReviewController');
+});
+
