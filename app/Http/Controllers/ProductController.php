@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use App\Http\Resources\Product\ProductCollection;
 use App\Http\Resources\Product\ProductResource;
 use App\Model\Product;
@@ -13,7 +15,7 @@ class ProductController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api')->except('index','show');
+        $this->middleware('auth:api')->except('index','show','update');
     }
     /**
      * Display a listing of the resource.
@@ -100,17 +102,10 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $validator=Validator::make($request->all(),[
-            'id'   => 'required',
-            'name' => 'required|max:30|unique:products',
-            'description' =>'required|max:250',
-            'price' => 'required|max:10',
-            'discount' => 'required|max:2',
-            'stock' => 'required|max:6',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
-        }
+            $product->update($request->all());
+            return response([
+                'data'=>new ProductResource($product),
+            ],201);
 
     }
 
@@ -122,6 +117,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+        return response(null,Response::HTTP_NO_CONTENT);
     }
 }
